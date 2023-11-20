@@ -1,36 +1,35 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useState } from 'react';
+import Todo from '../src/pages/Todo';
+import UserAuthentication from '../src/pages/UserAuthentication';
+import { createTheme,colors,ThemeProvider } from '@mui/material';
 
-function App() {
-  const [count, setCount] = useState(0)
+const theme = createTheme({
+  palette:{
+    secondary:{
+      main: colors.orange[500]
+    }
+  }
+})
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  return (
-    <>
-      <div>
-        <h1>Hello guy</h1>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+ // add login 
+ const handleLogin =()=> {
 
-export default App
+  setIsLoggedIn(!isLoggedIn)
+ }
+    return (
+  <ThemeProvider theme={theme}>
+    {isLoggedIn ? (
+      <UserAuthentication  />
+      
+      ) : (
+        <Todo/>
+      )}
+
+</ThemeProvider>
+      
+    );
+};
+
+export default App;
