@@ -1,68 +1,55 @@
-:root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
 body {
+  font-family: Arial, Helvetica, sans-serif;
+  background-color: whitesmoke;
   margin: 0;
+}
+h1{
+  color:#ef4444;
+  font-style: italic;
+  font-weight: inherit;
+  font-size:3.75rem;
+  text-align: center;
+  margin: 0;
+}
+main{
+  margin-top:20px;
+  background-color: white;
+  max-width: 650px;
+  min-width: 300px;
+  margin: auto;
+  border:1px solid lightgray; 
+  border-radius:0.5rem;
+  box-shadow: 0 2px 4px #0003, 0 25px 50px #0000001a;
+}
+input{
+  font-size:100%;
+  width:100%;
+  padding:10px;
+  border:0;
+}
+input:placeholder-shown{
+  font-style:italic;
+}
+button{
+  background-color: white;
+  border:2px solid #0000001a;
+  border-radius: 0.5rem;
+  padding:0.5rem;
+  white-space: nowrap;
+  font-size:100%;
+  cursor:pointer;
+}
+main > form,
+main > div{
+  padding:0.5rem;
+  border-bottom:1px solid lightgrey;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+  align-items: center;
+  gap: 0.25rem
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+input[type="checkbox"]{
+  height:1.5rem;
+  width:1.5rem;
+  flex-shrink:0
 }

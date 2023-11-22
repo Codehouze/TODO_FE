@@ -1,33 +1,33 @@
-import React, { useState } from 'react';
-import Todo from '../src/pages/Todo';
-import UserAuthentication from '../src/pages/UserAuthentication';
+import React, { useEffect, useState } from 'react';
+import Todo from './pages/Todo';
 import { createTheme,colors,ThemeProvider } from '@mui/material';
+import {Route, Routes} from "react-router-dom";
+
+import Layout from './component/layout';
+// import RequireAuth from './component/RequireAuth';
+
+
+
 
 const theme = createTheme({
+  status:{
+    danger:'#e53e3e',
+  },
   palette:{
     secondary:{
-      main: colors.orange[500]
+      main: colors.red[700]
     }
   }
 })
 const App = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
- // add login 
- const handleLogin =()=> {
-
-  setIsLoggedIn(!isLoggedIn)
- }
+ 
     return (
   <ThemeProvider theme={theme}>
-    {isLoggedIn ? (
-      <UserAuthentication  />
-      
-      ) : (
-        <Todo/>
-      )}
+        
+          <Todo /> 
 
-</ThemeProvider>
+
+  </ThemeProvider>
       
     );
 };
