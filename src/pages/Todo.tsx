@@ -15,7 +15,7 @@ const TodoApp = () => {
   const [todo, setTodo] = useState([]);
   const [formData, setFormData] = useState({ title: '' });
   const [errors, setErrors] = useState({ title: '' });
-  const [completed, setCompleted] = useState(false);
+
   const [isLoading, setIsLoading] = useState(false);
   const [selectedTodo, setSelectedTodo] = useState(null)
   const label = { inputProps: { 'aria-label': 'Switch demo' } };
@@ -25,6 +25,23 @@ const TodoApp = () => {
   > | null>(null);
 
   const handleCloseSnackbar = () => setSnackbar(null);
+
+  const [completed, setCompleted] = useState(()=>{
+    // Retrieve the value from localStorage
+    const storedValue = localStorage.getItem('completed');
+
+    // Return the parsed value or the default value (false)
+    return storedValue ? JSON.parse(storedValue) : false;
+  });
+
+  useEffect(() => {
+    // Save the current value of `completed` to localStorage whenever it changes
+    localStorage.setItem('completed', JSON.stringify(completed));
+  }, [completed]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCompleted(event.target.checked);
+  };
 
   // Fetch all todos when the component mounts
   useEffect(() => {
@@ -54,7 +71,7 @@ const TodoApp = () => {
       // Call the API to update the completion status
       const result = await completeTodo({ id, completed: updatedCompleted });
 
-      await console.log(id, completed)
+     
       // Update the local state if needed
       setCompleted(updatedCompleted);
 
@@ -66,9 +83,6 @@ const TodoApp = () => {
       // Handle errors if needed
       console.error('Error updating todo:', error);
     }
-  };
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCompleted(completed);
   };
 
   const handleProcessRowUpdateError = useCallback((error: Error) => {
@@ -84,8 +98,7 @@ const TodoApp = () => {
     const result = await updateTodo(id, title)
     setSnackbar({ children: 'User successfully saved', severity: 'success' });
     return result;
-  },
-    [updateTodo]);
+  },[updateTodo]);
 
   const handleDeleteTodo = (selectedTodo: number) => {
     if (selectedTodo !== undefined) {
@@ -179,7 +192,6 @@ const TodoApp = () => {
       width: 150,
       renderCell: (params) => (
         <Button
-
           color="primary"
           onClick={() => handleCompletedTodo(params.row)}
         >
