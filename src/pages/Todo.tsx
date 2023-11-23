@@ -1,5 +1,5 @@
 import { Grid, Paper, Button, Box, TextField, Typography } from '@mui/material';
-import { DataGrid, GridCellEditStopParams,  GridColDef,  GridRowModel, MuiEvent } from '@mui/x-data-grid';
+import { DataGrid, GridCellEditStopParams, GridColDef, GridRowModel, MuiEvent } from '@mui/x-data-grid';
 import { ITodo } from "../types/ITodo";
 import Switch from '@mui/material/Switch';
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded'
@@ -15,8 +15,9 @@ const TodoApp = () => {
   const [todo, setTodo] = useState([]);
   const [formData, setFormData] = useState({ title: '' });
   const [errors, setErrors] = useState({ title: '' });
-
-  const [isLoading, setIsLoading] = useState(false);
+  // Update initial state to true
+  const [isLoading, setIsLoading] = useState(false); 
+console.log("Intialize isLoading",isLoading)
   const [selectedTodo, setSelectedTodo] = useState(null)
   const label = { inputProps: { 'aria-label': 'Switch demo' } };
   const [snackbar, setSnackbar] = useState<Pick<
@@ -26,7 +27,7 @@ const TodoApp = () => {
 
   const handleCloseSnackbar = () => setSnackbar(null);
 
-  const [completed, setCompleted] = useState(()=>{
+  const [completed, setCompleted] = useState(() => {
     // Retrieve the value from localStorage
     const storedValue = localStorage.getItem('completed');
 
@@ -49,16 +50,25 @@ const TodoApp = () => {
   }, []);
 
   const fetchAllTodos = () => {
+      // Set isLoading to true before making the API call
+      setIsLoading(true);
+      console.log("isLoading before Api call is ",isLoading)
     getAllTodo().then((payload) => {
+     
       setTodo(payload.todo);
-
+     
     }).catch((error) => {
       console.error('Error fetching todos:', error);
       // Handle the error, e.g., show a message to the user
-    });
+    })
+    .finally(()=>{
+       // Set isLoading to false when data (or error) is loaded
+       console.log("isLoading after calling Api ",isLoading)
+      setIsLoading(false);
+    })
   };
-
-  const todoObjects = todo.map((todoItem: ITodo) => ({ ...todoItem }));
+    // retrieve data and map through output from get all api call..  
+  const todoObjects = (todo?? []).map((todoItem: ITodo) => ({ ...todoItem }));
 
   const handleCompletedTodo = async (params: ITodo) => {
 
@@ -71,7 +81,7 @@ const TodoApp = () => {
       // Call the API to update the completion status
       const result = await completeTodo({ id, completed: updatedCompleted });
 
-     
+
       // Update the local state if needed
       setCompleted(updatedCompleted);
 
@@ -98,7 +108,7 @@ const TodoApp = () => {
     const result = await updateTodo(id, title)
     setSnackbar({ children: 'User successfully saved', severity: 'success' });
     return result;
-  },[updateTodo]);
+  }, [updateTodo]);
 
   const handleDeleteTodo = (selectedTodo: number) => {
     if (selectedTodo !== undefined) {
@@ -196,7 +206,7 @@ const TodoApp = () => {
           onClick={() => handleCompletedTodo(params.row)}
         >
           <Switch {...label} checked={completed}
-      onChange={handleChange}/>
+            onChange={handleChange} />
         </Button>
       ),
 
@@ -220,7 +230,7 @@ const TodoApp = () => {
   ];
 
   return (
-    
+
     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
       <Grid container justifyContent="center" alignItems="center" sx={{ maxWidth: '700px', width: '100%' }}>
         <Paper elevation={0} sx={{ width: "100%", height: '80vh', margin: "20px auto" }}>
@@ -269,45 +279,45 @@ const TodoApp = () => {
             {/* ( */}
             {/* list todo */}
             {!isLoading ? (
-            <Box sx={{ height: 400, width: '120vh', paddingTop: '20px', mx: "auto", alignItems: "center", justifyItems: "center" }}>
-              <DataGrid getRowId={(row) => row.id}
-                rows={todoObjects}
-                columns={columns}
-                sx={{ width: '100%', mx: 'auto', justifyContent: 'center', alignContent: 'center' }}
-                initialState={{
-                  pagination: {
-                    paginationModel: {
-                      pageSize: 10,
+              <Box sx={{ height: 400, width: '120vh', paddingTop: '20px', mx: "auto", alignItems: "center", justifyItems: "center" }}>
+                <DataGrid getRowId={(row) => row.id}
+                  rows={todoObjects}
+                  columns={columns}
+                  sx={{ width: '100%', mx: 'auto', justifyContent: 'center', alignContent: 'center' }}
+                  initialState={{
+                    pagination: {
+                      paginationModel: {
+                        pageSize: 10,
+                      },
                     },
-                  },
-                }}
-                processRowUpdate={handleUpdateTitle}
-                onProcessRowUpdateError={handleProcessRowUpdateError}
-                onCellEditStop={(params: GridCellEditStopParams, event: MuiEvent) => { handleUpdateTitle }}
-                pageSizeOptions={[10]}
-                checkboxSelection
-                disableRowSelectionOnClick
-                autoHeight
-                
-              />
-              {!!snackbar && (
-                <Snackbar
-                  open
-                  anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                  onClose={handleCloseSnackbar}
-                  autoHideDuration={6000}
-                >
-                  <Alert {...snackbar} onClose={handleCloseSnackbar} />
-                </Snackbar>
-              )}
-            </Box>
-              ):(  <Typography   sx={{fontSize: 24, margin:'12px auto', justifyContent: 'center', alignItmes:'center'}}>
-              You don't have any pending task.. 
+                  }}
+                  processRowUpdate={handleUpdateTitle}
+                  onProcessRowUpdateError={handleProcessRowUpdateError}
+                  onCellEditStop={(params: GridCellEditStopParams, event: MuiEvent) => { handleUpdateTitle }}
+                  pageSizeOptions={[10]}
+                  checkboxSelection
+                  disableRowSelectionOnClick
+                  autoHeight
+
+                />
+                {!!snackbar && (
+                  <Snackbar
+                    open
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                    onClose={handleCloseSnackbar}
+                    autoHideDuration={6000}
+                  >
+                    <Alert {...snackbar} onClose={handleCloseSnackbar} />
+                  </Snackbar>
+                )}
+              </Box>
+            ) : (<Typography sx={{ fontSize: 24, margin: '12px auto', justifyContent: 'center', alignItmes: 'center' }}>
+              Loading...
             </Typography>)}
-  
+
           </Grid>
-        
-         
+
+
         </Paper>
       </Grid>
 
