@@ -12,12 +12,11 @@ import * as yup from 'yup';
 
 
 const TodoApp = () => {
-  const [todo, setTodo] = useState([]);
+  const [todo, setTodo] = useState<ITodo[]>([]);
   const [formData, setFormData] = useState({ title: '' });
   const [errors, setErrors] = useState({ title: '' });
   // Update initial state to true
   const [isLoading, setIsLoading] = useState(false); 
-console.log("Intialize isLoading",isLoading)
   const [selectedTodo, setSelectedTodo] = useState(null)
   const label = { inputProps: { 'aria-label': 'Switch demo' } };
   const [snackbar, setSnackbar] = useState<Pick<
@@ -40,8 +39,12 @@ console.log("Intialize isLoading",isLoading)
     localStorage.setItem('completed', JSON.stringify(completed));
   }, [completed]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCompleted(event.target.checked);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>,id:number) => {
+    setTodo((prevTodo) =>
+    prevTodo.map((todoItem) =>
+      todoItem.id === id ? { ...todoItem, completed: !todoItem.completed } : todoItem
+    ))
+    // setCompleted(event.target.checked);
   };
 
   // Fetch all todos when the component mounts
@@ -52,8 +55,7 @@ console.log("Intialize isLoading",isLoading)
   const fetchAllTodos = () => {
       // Set isLoading to true before making the API call
       setIsLoading(true);
-      console.log("isLoading before Api call is ",isLoading)
-    getAllTodo().then((payload) => {
+      getAllTodo().then((payload) => {
      
       setTodo(payload.todo);
      
@@ -63,39 +65,37 @@ console.log("Intialize isLoading",isLoading)
     })
     .finally(()=>{
        // Set isLoading to false when data (or error) is loaded
-       console.log("isLoading after calling Api ",isLoading)
       setIsLoading(false);
     })
   };
     // retrieve data and map through output from get all api call..  
-  const todoObjects = (todo?? []).map((todoItem: ITodo) => ({ ...todoItem }));
+    const todoObjects = (todo?? []).map((todoItem: ITodo) => ({ ...todoItem }));
+
+    // complete todo
+ 
 
   const handleCompletedTodo = async (params: ITodo) => {
-
     try {
-
-      const { id, completed } = params
-
+      const { id, completed } = params;
       const updatedCompleted = !completed;
-
+  
       // Call the API to update the completion status
-      const result = await completeTodo({ id, completed: updatedCompleted });
-
-
+      await completeTodo({ id, completed: updatedCompleted });
+  
       // Update the local state if needed
-      setCompleted(updatedCompleted);
-
-      // fetch the updated todos if needed
-      fetchAllTodos();
-
-
+      setTodo((prevTodo) =>
+        prevTodo.map((todoItem) =>
+          todoItem.id === id ? { ...todoItem, completed: updatedCompleted } : todoItem
+        )
+      );
     } catch (error) {
       // Handle errors if needed
       console.error('Error updating todo:', error);
     }
   };
 
-  const handleProcessRowUpdateError = useCallback((error: Error) => {
+
+  const handleUpdateTitleUpdateError = useCallback((error: Error) => {
     console.log(error.message)
     setSnackbar({ children: error.message, severity: 'error' });
   }, []);
@@ -105,9 +105,23 @@ console.log("Intialize isLoading",isLoading)
   // Make the HTTP request to save in the backend
   const handleUpdateTitle = useCallback(async (newRow: GridRowModel) => {
     const { id, title } = newRow
-    const result = await updateTodo(id, title)
-    setSnackbar({ children: 'User successfully saved', severity: 'success' });
-    return result;
+    try{
+    const result = await updateTodo(id, title);
+    const updatedRow = { ...result, }; // Update the existing row with the new id
+    const{message,updatedTodo}=updatedRow
+
+    // Update the local state if needed
+    setTodo((prevTodo) =>
+      prevTodo.map((todoItem) =>
+        todoItem.id === updatedTodo.id ? { ...todoItem, title: updatedTodo.title } : todoItem
+      )
+    );
+   
+    setSnackbar({ children: message, severity: 'success' });
+    return updatedTodo;
+    }catch(error) {
+    console.error('Error updating title',error);
+    }
   }, [updateTodo]);
 
   const handleDeleteTodo = (selectedTodo: number) => {
@@ -154,9 +168,10 @@ console.log("Intialize isLoading",isLoading)
     try {
       await validationSchema.validate(formData, { abortEarly: false });
       const data = formData.title
-      create(data).then(() => {
+      await create(data).then(() => {
         fetchAllTodos();
         setFormData({ title: "" });
+        setCompleted(false);
         setErrors({ title: '' });
 
       })
@@ -205,8 +220,8 @@ console.log("Intialize isLoading",isLoading)
           color="primary"
           onClick={() => handleCompletedTodo(params.row)}
         >
-          <Switch {...label} checked={completed}
-            onChange={handleChange} />
+          <Switch {...label} checked={params.row.completed}
+            onChange={(e)=>handleChange(e,params.row.id)} />
         </Button>
       ),
 
@@ -275,8 +290,6 @@ console.log("Intialize isLoading",isLoading)
 
 
             </main>
-
-            {/* ( */}
             {/* list todo */}
             {!isLoading ? (
               <Box sx={{ height: 400, width: '120vh', paddingTop: '20px', mx: "auto", alignItems: "center", justifyItems: "center" }}>
@@ -292,7 +305,7 @@ console.log("Intialize isLoading",isLoading)
                     },
                   }}
                   processRowUpdate={handleUpdateTitle}
-                  onProcessRowUpdateError={handleProcessRowUpdateError}
+                  onProcessRowUpdateError={handleUpdateTitleUpdateError}
                   onCellEditStop={(params: GridCellEditStopParams, event: MuiEvent) => { handleUpdateTitle }}
                   pageSizeOptions={[10]}
                   checkboxSelection

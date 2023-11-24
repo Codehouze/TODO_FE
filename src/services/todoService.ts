@@ -40,6 +40,7 @@ export const getOneTodo = async (id:number) => {
         title
       });
     const payload = response.data;
+    console.log("Returned object",payload)
     return payload;
   };
 
