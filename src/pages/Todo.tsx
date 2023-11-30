@@ -105,11 +105,14 @@ const TodoApp = () => {
   // Make the HTTP request to save in the backend
   const handleUpdateTitle = useCallback(async (newRow: GridRowModel) => {
     const { id, title } = newRow
+    console.log(id, title,newRow);
     try{
     const result = await updateTodo(id, title);
-    const updatedRow = { ...result, }; // Update the existing row with the new id
-    const{message,updatedTodo}=updatedRow
+ 
 
+    const updatedRow = { ...result, }; // Update the existing row with the new id
+    const{message,updatedTodo}=updatedRow;
+    console.log(message,updatedRow);
     // Update the local state if needed
     setTodo((prevTodo) =>
       prevTodo.map((todoItem) =>
@@ -195,7 +198,7 @@ const TodoApp = () => {
     {
       field: 'title',
       headerName: 'Todos',
-      width: 250,
+      width: 500,
       editable: true,
     },
     {
@@ -214,7 +217,7 @@ const TodoApp = () => {
       field: 'isCompleted',
       headerName: 'Update Status',
       type: 'button',
-      width: 150,
+      width: 120,
       renderCell: (params) => (
         <Button
           color="primary"
@@ -230,7 +233,7 @@ const TodoApp = () => {
       field: 'delete',
       headerName: 'Delete',
       type: 'button',
-      width: 80,
+      width: 100,
       renderCell: (params) => (
         <Button
           color="secondary"
@@ -245,10 +248,8 @@ const TodoApp = () => {
   ];
 
   return (
-
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-      <Grid container justifyContent="center" alignItems="center" sx={{ maxWidth: '700px', width: '100%' }}>
-        <Paper elevation={0} sx={{ width: "100%", height: '80vh', margin: "20px auto" }}>
+      <Grid container justifyContent="center" alignItems="center" sx={{ width: '100%',padding:'16px' }}>
+        <Paper elevation={0} sx={{ width: "100%",maxWidth:'950px', padding:"16px" }}>
 
           <h1>Todo</h1>
           <Grid container>
@@ -284,7 +285,7 @@ const TodoApp = () => {
                   }}
                 // onClick={handleCreateTodo}
                 >
-                  <AddCircleRoundedIcon sx={{ fontSize: '54px' }} />
+                  <AddCircleRoundedIcon sx={{ fontSize: '36px' }} />
                 </Button>
               </form>
 
@@ -292,7 +293,7 @@ const TodoApp = () => {
             </main>
             {/* list todo */}
             {!isLoading ? (
-              <Box sx={{ height: 400, width: '120vh', paddingTop: '20px', mx: "auto", alignItems: "center", justifyItems: "center" }}>
+              <Box sx={{ height:'auto', width: '120vh', paddingTop: '20px', mx: "auto", alignItems: "center", justifyItems: "center" }}>
                 <DataGrid getRowId={(row) => row.id}
                   rows={todoObjects}
                   columns={columns}
@@ -324,7 +325,7 @@ const TodoApp = () => {
                   </Snackbar>
                 )}
               </Box>
-            ) : (<Typography sx={{ fontSize: 24, margin: '12px auto', justifyContent: 'center', alignItmes: 'center' }}>
+            ) : (<Typography sx={{ fontSize: 24, margin: '12px auto', justifyContent: 'center', alignItems: 'center' }}>
               Loading...
             </Typography>)}
 
@@ -334,7 +335,7 @@ const TodoApp = () => {
         </Paper>
       </Grid>
 
-    </div>
+
   );
 };
 
